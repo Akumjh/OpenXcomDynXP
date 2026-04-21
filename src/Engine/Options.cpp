@@ -573,6 +573,8 @@ void createOptionsOTHER()
 
 void createAdvancedOptionsOTHER()
 {
+	_info.push_back(OptionInfo(OPTION_OXCE, "DynamicXP", &dynamicXP, true, "STR_DYNAMICXP", "STR_GENERAL"));
+	_info.push_back(OptionInfo(OPTION_OXCE, "ExpScale", &expScale, 200, "STR_EXPSCALE", "STR_GENERAL"));
 	// your fork's advanced options here
 }
 

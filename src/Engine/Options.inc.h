@@ -183,3 +183,8 @@ OPT SoundFormat currentSound;
 
 OPT int battleXcomSpeedOrig;
 OPT int battleAlienSpeedOrig;
+
+
+// Dynamic XP
+OPT bool dynamicXP;
+OPT int expScale;

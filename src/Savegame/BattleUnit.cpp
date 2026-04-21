@@ -4050,6 +4050,7 @@ bool BattleUnit::postMissionProcedures(const Mod *mod, SavedGame *geoscape, Save
 	updateGeoscapeStats(s);
 
 	UnitStats *stats = s->getCurrentStatsEditable();
+	const UnitStats *iStats = s->getInitStats();
 	StatAdjustment statsOld = { };
 	statsOld.statGrowth = (*stats);
 	statsDiff.statGrowth = -(*stats);        // subtract old stat
@@ -4067,33 +4068,33 @@ bool BattleUnit::postMissionProcedures(const Mod *mod, SavedGame *geoscape, Save
 	}
 	if (_exp.reactions && stats->reactions < caps.reactions)
 	{
-		stats->reactions += improveStat(_exp.reactions);
+		stats->reactions += improveStat(_exp.reactions,iStats->reactions,stats->reactions,caps.reactions);
 	}
 	if (_exp.firing && stats->firing < caps.firing)
 	{
-		stats->firing += improveStat(_exp.firing);
+		stats->firing += improveStat(_exp.firing,iStats->firing,stats->firing,caps.firing);
 	}
 	if (_exp.melee && stats->melee < caps.melee)
 	{
-		stats->melee += improveStat(_exp.melee);
+		stats->melee += improveStat(_exp.melee,iStats->melee,stats->melee,caps.melee);
 	}
 	if (_exp.throwing && stats->throwing < caps.throwing)
 	{
-		stats->throwing += improveStat(_exp.throwing);
+		stats->throwing += improveStat(_exp.throwing,iStats->throwing,stats->throwing,caps.throwing);
 	}
 	if (_exp.psiSkill && stats->psiSkill < caps.psiSkill)
 	{
-		stats->psiSkill += improveStat(_exp.psiSkill);
+		stats->psiSkill += improveStat(_exp.psiSkill,iStats->psiSkill,stats->psiSkill,caps.psiSkill);
 	}
 	if (_exp.psiStrength && stats->psiStrength < caps.psiStrength)
 	{
-		stats->psiStrength += improveStat(_exp.psiStrength);
+		stats->psiStrength += improveStat(_exp.psiStrength,iStats->psiStrength,stats->psiStrength,caps.psiStrength);
 	}
 	if (mod->isManaTrainingPrimary())
 	{
 		if (_exp.mana && stats->mana < caps.mana)
 		{
-			stats->mana += improveStat(_exp.mana);
+			stats->mana += improveStat(_exp.mana,iStats->mana,stats->mana,caps.mana);
 		}
 	}
 
@@ -4169,13 +4170,24 @@ bool BattleUnit::postMissionProcedures(const Mod *mod, SavedGame *geoscape, Save
  * @param Experience counter.
  * @return Stat increase.
  */
-int BattleUnit::improveStat(int exp) const
+int BattleUnit::improveStat(int exp, int init, int cur, int max) const
 {
+	if (Options::dynamicXP)
+	{
+		int range = max - init;
+		if (range == 0)
+			range = 1;
+		int distance = max - cur;
+		distance = distance + RNG::generate(0, range - 1); // effectively adds a number between one and zero, treating fractions as a percentage
+		exp = (exp * distance * Options::expScale) / (range*100);
+	}
+
 	if      (exp > 10) return RNG::generate(2, 6);
 	else if (exp > 5)  return RNG::generate(1, 4);
 	else if (exp > 2)  return RNG::generate(1, 3);
 	else if (exp > 0)  return RNG::generate(0, 1);
 	else               return 0;
+
 }
 
 /**

@@ -193,7 +193,7 @@ private:
 	ScriptValues<BattleUnit> _scriptValues;
 
 	/// Calculate stat improvement.
-	int improveStat(int exp) const;
+	int improveStat(int exp, int init,int cur, int max) const;
 	/// Helper function initializing recolor vector.
 	void setRecolor(int basicLook, int utileLook, int rankLook);
 	/// Helper function preparing Time Units recovery at beginning of turn.
